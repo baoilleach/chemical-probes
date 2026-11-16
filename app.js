@@ -10,6 +10,7 @@ const elements = Object.fromEntries([
 ].map((id) => [id, document.getElementById(id)]));
 
 let dataset;
+let probeImagePaths = new Map();
 let viewPairs = [];
 let rows = [];
 let columns = [];
@@ -496,11 +497,32 @@ function renderDetail(view) {
   for (const [index, articleIds] of view.groups) {
     const probe = dataset.probes[index];
     const item = node("li");
+    if (probeImagePaths.has(probe.id)) {
+      const imageURL = `./assets/probes/${encodeURIComponent(probeImagePaths.get(probe.id))}`;
+      const imageLink = node("a", "probe-image-link");
+      imageLink.href = imageURL;
+      imageLink.target = "_blank";
+      imageLink.rel = "noopener noreferrer";
+      imageLink.setAttribute("aria-label", `Open structure image for ${probe.name}`);
+      const image = node("img", "probe-structure");
+      image.src = imageURL;
+      image.alt = `2D chemical structure of ${probe.name}`;
+      image.loading = "lazy";
+      image.decoding = "async";
+      image.width = 96;
+      image.height = 96;
+      imageLink.append(image);
+      item.append(imageLink);
+    } else {
+      item.append(node("span", "probe-structure-placeholder", "Structure unavailable"));
+    }
+    const information = node("div", "probe-copy");
     const link = node("a", "", probe.name);
     link.href = `https://www.ebi.ac.uk/chembl/compound_report_card/${encodeURIComponent(probe.id)}/`;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
-    item.append(link, node("small", "", `${formatNumber(articleIds.length)} article ID${articleIds.length === 1 ? "" : "s"}`));
+    information.append(link, node("small", "", probe.id), node("small", "", `${formatNumber(articleIds.length)} article ID${articleIds.length === 1 ? "" : "s"}`));
+    item.append(information);
     probeList.append(item);
   }
   probeSection.append(probeList);
@@ -658,9 +680,18 @@ function bindControls() {
 async function start() {
   readURL();
   try {
-    const response = await fetch("./data/dataset.json");
+    const [response, imageResponse] = await Promise.all([
+      fetch("./data/dataset.json"),
+      fetch("./assets/probes/manifest.json"),
+    ]);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     dataset = await response.json();
+    if (imageResponse.ok) {
+      const imageManifest = await imageResponse.json();
+      probeImagePaths = new Map(Object.entries(imageManifest.files)
+        .filter(([probeId, details]) => [`.svg`, `.png`].some((extension) => details.path === `${probeId}${extension}`))
+        .map(([probeId, details]) => [probeId, details.path]));
+    }
     dataset.maxArticles = Math.max(...dataset.pairs.map((pair) => pair.articleCount));
     renderFilterControls();
     bindControls();

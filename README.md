@@ -20,6 +20,8 @@ python3 scripts/build_data.py
 
 The annotated file is about 914 MB and stays in `nbu/`; the static browser file is about 1 MB. The current build verifies 820,933 evidence rows and 5,521 pairs, with no missing evidence or article-count mismatches.
 
+Probe structure images are stored as static assets in `assets/probes/`; the browser does not call ChEMBL or PubChem. After rebuilding the dataset, run `python3 scripts/download_probe_images.py` to fill missing images, or add `--force` to re-download every image. The script checks existing images and writes a source and SHA-256 manifest. There are 193 ChEMBL SVGs and one PubChem PNG: ChEMBL's image and molecule endpoints return 404 for `CHEMBL3182444` (MK-5108), so the script uses PubChem CID `24748204` after checking that its InChIKey matches the Zenodo record (`LCVIRAZGMYMNNT-UHFFFAOYSA-N`).
+
 ## Verified source data
 
 The Zenodo record, *Chemical Probes in Scientific Literature: A Pipeline for Target-Disease Evidence*, contains the data. The associated [analysis code](https://github.com/chembl/chemical_probes_lit) documents how the pipeline constructs and plots probe–target–disease evidence. Pin the published Zenodo record and its file checksums during data preparation so a later record update cannot silently change the display.
