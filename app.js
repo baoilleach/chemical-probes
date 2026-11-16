@@ -87,8 +87,8 @@ function makeMultiFilter(hostId, title, options, stateKey) {
   const inner = node("div", "filter-inner");
   const search = node("input", "filter-search");
   search.type = "search";
-  search.placeholder = `Find ${title.toLowerCase()}`;
-  search.setAttribute("aria-label", `Find ${title.toLowerCase()}`);
+  search.placeholder = `Find and select ${title.toLowerCase()}`;
+  search.setAttribute("aria-label", `Find and select ${title.toLowerCase()}`);
   const list = node("div", "filter-options");
   inner.append(search, list);
   details.append(inner);

@@ -9,3 +9,4 @@
 .probe-copy{min-width:0;display:grid;gap:5px}
 .probe-copy a{font-weight:700;overflow-wrap:anywhere}
 .probe-copy small{display:block}
+.filter-option[hidden]{display:none}
