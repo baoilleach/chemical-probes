@@ -1,1 +1,3 @@
 nbu/
+__pycache__/
+*.pyc

@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "record": "https://zenodo.org/records/20744471",
+    "generatedAt": "2026-11-16T16:21:44.766546+00:00",
+    "sourceChecksums": {
+      "ner_target_disease_pairs.tsv": "9ecadde806d2f9933b9600e302be7d0a",
+      "ner_targets.tsv": "b105fd3dc07308240eab4af9f0ce1681",
+      "ner_diseases.tsv": "aeb95e923f58607ea4ef09f7574d1683",
+      "ner_probes.tsv": "03f1ff13d698d657a96ea9aa5708ad20",
+      "ner_probes_triplets_ptpairs_evd.tsv": "bab3c06010aca8e845c0da453c742fd1",
+      "ner_probes_triplets_novel.tsv": "70b40c1c944852a5f97de064f863f615",
+      "disease_term_blacklist.tsv": "8663479fffc2e983287a6cea94f3d6d2"
+    },
+    "sourceEvidenceRows": 820933,
+    "pairCount": 5521,
+    "sourceCountMismatches": 0,
+    "missingEvidencePairs": 0,
+    "extraEvidencePairs": 0,
+    "flaggedDiseaseCount": 25,
+    "flaggedPairCount": 247
+  },
+  "mismatches": [],
+  "missingEvidence": [],
+  "extraEvidence": []
+}

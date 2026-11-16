@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>Chemical probe evidence atlas</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css">
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <div class="brand-copy">
+        <p class="eyebrow">Literature evidence explorer</p>
+        <h1>Chemical probe evidence atlas</h1>
+        <p>Explore target–disease associations found with chemical probes in scientific literature.</p>
+      </div>
+      <a class="source-link" href="https://zenodo.org/records/20744471" target="_blank" rel="noopener noreferrer">View source dataset <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <div class="app-layout">
+      <aside class="filter-panel" aria-labelledby="filters-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Explore the evidence</p>
+            <h2 id="filters-heading">Filters</h2>
+          </div>
+          <button id="reset-filters" class="text-button" type="button">Reset all</button>
+        </div>
+        <label class="field-label" for="global-search">Search targets or diseases</label>
+        <input id="global-search" class="search-field" type="search" placeholder="e.g. EGFR or breast cancer" autocomplete="off">
+        <div class="filter-groups">
+          <div id="target-filter"></div>
+          <div id="disease-filter"></div>
+          <div id="area-filter"></div>
+          <div id="probe-filter"></div>
+        </div>
+        <div class="field-block">
+          <label class="field-label" for="min-articles">Minimum articles per pair</label>
+          <input id="min-articles" class="number-field" type="number" min="1" step="1" value="1">
+        </div>
+        <label class="checkline flagged-toggle"><input id="hide-flagged" type="checkbox"> Hide flagged disease terms</label>
+        <fieldset class="phase-filter">
+          <legend>Maximum clinical phase</legend>
+          <div id="phase-options" class="phase-options"></div>
+        </fieldset>
+        <div class="filter-note">Filters combine across fields. Select multiple values within a field to include any of them.</div>
+      </aside>
+
+      <main class="main-panel">
+        <section class="overview" aria-labelledby="overview-heading">
+          <div class="overview-heading">
+            <div>
+              <p class="eyebrow">Full source matrix</p>
+              <h2 id="overview-heading">Evidence at a glance</h2>
+            </div>
+            <span id="filtered-badge" class="filtered-badge" hidden>Filtered view</span>
+          </div>
+          <div class="stat-grid" aria-live="polite">
+            <div class="stat-card"><strong id="pair-count">—</strong><span>observed pairs</span></div>
+            <div class="stat-card"><strong id="target-count">—</strong><span>targets</span></div>
+            <div class="stat-card"><strong id="disease-count">—</strong><span>diseases</span></div>
+            <div class="stat-card"><strong id="probe-count">—</strong><span>probes in view</span></div>
+          </div>
+        </section>
+
+        <section class="matrix-card" aria-labelledby="matrix-heading">
+          <div class="matrix-topline">
+            <div>
+              <h2 id="matrix-heading">Target × disease matrix</h2>
+              <p id="matrix-status" role="status">Loading dataset…</p>
+            </div>
+            <div class="matrix-actions">
+              <label for="row-sort">Rows <select id="row-sort"><option value="area">Therapeutic area</option><option value="name">Disease name</option><option value="articles">Most articles</option></select></label>
+              <label for="col-sort">Columns <select id="col-sort"><option value="name">Gene symbol</option><option value="articles">Most articles</option></select></label>
+              <label for="zoom">Cell size <input id="zoom" type="range" min="28" max="56" step="4" value="36"></label>
+            </div>
+          </div>
+          <div class="matrix-subline">
+            <label class="checkline"><input id="show-empty" type="checkbox"> Keep unmatched rows and columns</label>
+            <span>Scroll to explore · Click a bubble for evidence</span>
+          </div>
+          <div id="matrix-viewport" class="matrix-viewport" tabindex="0" role="application" aria-label="Target by disease evidence matrix. Use arrow keys to navigate, Enter to open details.">
+            <div id="matrix-content" class="matrix-content"><canvas id="matrix-canvas" aria-hidden="true"></canvas></div>
+          </div>
+          <div class="matrix-legend">
+            <div><span class="legend-title">Distinct article IDs</span><div class="color-ramp"></div><div class="color-ticks"><span>1</span><span>10</span><span>100</span><span>1,000+</span></div></div>
+            <div class="size-key"><span class="legend-title">Distinct probes</span><span class="size-dot size-one"></span> 1 <span class="size-dot size-three"></span> 3 <span class="size-dot size-five"></span> 5+</div>
+            <div class="phase-key"><span class="legend-title">Bubble label</span> 0.5–4: highest clinical phase · n: no matched phase</div>
+          </div>
+        </section>
+
+        <section class="results-card" aria-labelledby="results-heading">
+          <div class="results-heading"><div><h2 id="results-heading">Filtered pairs</h2><p>A keyboard-friendly table of the same evidence shown above.</p></div><button id="download-csv" class="button" type="button">Download CSV</button></div>
+          <div class="table-wrap"><table><thead><tr><th scope="col">Target</th><th scope="col">Disease</th><th scope="col">Therapeutic area</th><th scope="col">Probes</th><th scope="col">Articles</th><th scope="col">Phase</th><th scope="col"><span class="sr-only">Details</span></th></tr></thead><tbody id="results-body"></tbody></table></div>
+          <div class="pager"><span id="page-status"></span><div><button id="page-prev" type="button">Previous</button><button id="page-next" type="button">Next</button></div></div>
+        </section>
+
+        <footer class="site-footer">Literature co-occurrence supports exploration, not a claim of causality or clinical efficacy. ⚠ marks terms flagged by the source disease blacklist as possible extraction errors. Source: <a href="https://zenodo.org/records/20744471" target="_blank" rel="noopener noreferrer">Zenodo record 20744471</a> · <a href="https://github.com/chembl/chemical_probes_lit" target="_blank" rel="noopener noreferrer">analysis code</a>.</footer>
+      </main>
+
+      <aside id="detail-panel" class="detail-panel" aria-labelledby="detail-heading" hidden>
+        <div class="detail-inner"><div class="detail-topline"><p class="eyebrow">Evidence detail</p><button id="close-detail" class="icon-button" type="button" aria-label="Close detail panel">×</button></div><div id="detail-content"></div></div>
+      </aside>
+    </div>
+    <div id="matrix-tooltip" class="matrix-tooltip" role="tooltip" hidden></div>
+  </body>
+</html>
