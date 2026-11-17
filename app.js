@@ -171,6 +171,8 @@ function viewForPair(pair) {
 
 function applyFilters() {
   const query = state.query.trim().toLowerCase();
+  const targetMatches = (index) => !query || `${dataset.targets[index].name} ${dataset.targets[index].id}`.toLowerCase().includes(query);
+  const diseaseMatches = (index) => !query || `${dataset.diseases[index].name} ${dataset.diseases[index].id}`.toLowerCase().includes(query);
   viewPairs = [];
   const targetTotals = new Map();
   const diseaseTotals = new Map();
@@ -179,7 +181,7 @@ function applyFilters() {
     const target = dataset.targets[pair.targetIndex];
     const disease = dataset.diseases[pair.diseaseIndex];
     if (state.hideFlagged && disease.flagged) continue;
-    if (query && !target.name.toLowerCase().includes(query) && !disease.name.toLowerCase().includes(query)) continue;
+    if (!targetMatches(pair.targetIndex) && !diseaseMatches(pair.diseaseIndex)) continue;
     if (state.targets.size && !state.targets.has(target.id)) continue;
     if (state.diseases.size && !state.diseases.has(disease.id)) continue;
     if (state.areas.size && !state.areas.has(areaId(disease))) continue;
@@ -192,10 +194,12 @@ function applyFilters() {
     for (const [probeIndex] of view.groups) visibleProbes.add(probeIndex);
   }
 
-  const allowedTargets = (index) => !state.targets.size || state.targets.has(dataset.targets[index].id);
+  const allowedTargets = (index) => (!state.targets.size || state.targets.has(dataset.targets[index].id)) &&
+    (!query || targetMatches(index) || targetTotals.has(index));
   const allowedDiseases = (index) => {
     const disease = dataset.diseases[index];
-    return (!state.hideFlagged || !disease.flagged) && (!state.diseases.size || state.diseases.has(disease.id)) && (!state.areas.size || state.areas.has(areaId(disease)));
+    return (!state.hideFlagged || !disease.flagged) && (!state.diseases.size || state.diseases.has(disease.id)) &&
+      (!state.areas.size || state.areas.has(areaId(disease))) && (!query || diseaseMatches(index) || diseaseTotals.has(index));
   };
   columns = dataset.targets.map((_, index) => index).filter((index) =>
     state.showEmpty ? allowedTargets(index) : targetTotals.has(index));
@@ -614,7 +618,6 @@ function downloadCSV() {
 }
 
 function bindControls() {
-  elements["global-search"].addEventListener("input", (event) => { state.query = event.target.value.trim(); applyFilters(); });
   elements["min-articles"].addEventListener("input", (event) => { state.minArticles = Math.max(1, Number.parseInt(event.target.value, 10) || 1); applyFilters(); });
   elements["hide-flagged"].addEventListener("change", (event) => { state.hideFlagged = event.target.checked; applyFilters(); });
   elements["row-sort"].addEventListener("change", (event) => { state.rowSort = event.target.value; applyFilters(); });
@@ -679,6 +682,14 @@ function bindControls() {
 
 async function start() {
   readURL();
+  elements["global-search"].value = state.query;
+  elements["global-search"].addEventListener("input", (event) => {
+    state.query = event.target.value.trim();
+    if (dataset) {
+      elements["matrix-viewport"].scrollTo(0, 0);
+      applyFilters();
+    }
+  });
   try {
     const [response, imageResponse] = await Promise.all([
       fetch("./data/dataset.json"),
