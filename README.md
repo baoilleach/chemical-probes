@@ -2,6 +2,8 @@
 
 Explore chemical probe evidence for target–disease associations in an interactive matrix. The viewer covers 5,521 observed pairs, 161 targets, 1,352 diseases, and 194 chemical probes from the [Zenodo dataset](https://zenodo.org/records/20744471).
 
+Developed by the [Chemical Biology Resources team at EMBL-EBI](https://www.ebi.ac.uk/about/teams/chemical-biology-resources/) with funding from [Open Targets](https://opentargets.org/).
+
 ## Run locally
 
 No installation or build step is needed. From this directory, run:
