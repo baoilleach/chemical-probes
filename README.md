@@ -14,6 +14,8 @@ python3 -m http.server 8000
 
 Open [http://localhost:8000/](http://localhost:8000/). The app can also be hosted on any static web server. Opening `index.html` directly from the filesystem may prevent the browser from loading the dataset.
 
+The interface uses locally bundled [EMBL-EBI Visual Framework 2.5.30](https://stable.visual-framework.dev/building/) CSS and IBM Plex Sans fonts. See [vendor/vf/README.md](vendor/vf/README.md) for sources and licenses. No framework JavaScript or external CDN is needed at runtime.
+
 ## Use the viewer
 
 - Search or filter by target, disease, therapeutic area, chemical probe, article count, or clinical phase. Probe filters recalculate the displayed probe and article counts.

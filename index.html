@@ -6,33 +6,37 @@
     <meta name="color-scheme" content="light">
     <title>Chemical probe evidence atlas</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./vendor/vf/styles.css">
     <link rel="stylesheet" href="./styles.css">
     <script type="module" src="./app.js"></script>
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="site-header">
-      <div class="resource-brand">
-        <img class="resource-mark" src="./favicon.svg" alt="" width="56" height="56">
-        <div class="brand-copy">
-          <p class="eyebrow">Literature evidence explorer</p>
-          <h1>Chemical probe evidence atlas</h1>
-          <p>Explore target–disease associations found with chemical probes in scientific literature.</p>
+      <div class="vf-body header-inner">
+        <div class="resource-brand">
+          <img class="resource-mark" src="./favicon.svg" alt="" width="56" height="56">
+          <div class="brand-copy">
+            <p class="eyebrow">Literature evidence explorer</p>
+            <h1>Chemical probe evidence atlas</h1>
+            <p>Explore target–disease associations found with chemical probes in scientific literature.</p>
+          </div>
         </div>
+        <a class="vf-button vf-button--secondary vf-button--sm source-link" href="https://zenodo.org/records/20744471" target="_blank" rel="noopener noreferrer">View source dataset <span aria-hidden="true">↗</span></a>
       </div>
-      <a class="source-link" href="https://zenodo.org/records/20744471" target="_blank" rel="noopener noreferrer">View source dataset <span aria-hidden="true">↗</span></a>
     </header>
 
-    <div class="app-layout">
+    <div class="vf-body app-layout">
       <aside class="filter-panel" aria-labelledby="filters-heading">
-        <div class="panel-heading">
+        <div class="vf-section-header panel-heading">
           <div>
             <p class="eyebrow">Explore the evidence</p>
-            <h2 id="filters-heading">Filters</h2>
+            <h2 id="filters-heading" class="vf-section-header__heading">Filters</h2>
           </div>
-          <button id="reset-filters" class="text-button" type="button">Reset all</button>
+          <button id="reset-filters" class="vf-button vf-button--link vf-button--sm text-button" type="button">Reset all</button>
         </div>
         <label class="field-label" for="global-search">Search targets or diseases</label>
-        <input id="global-search" class="search-field" type="search" placeholder="e.g. EGFR or breast cancer" autocomplete="off">
+        <input id="global-search" class="vf-form__input search-field" type="search" placeholder="e.g. EGFR or breast cancer" autocomplete="off">
         <div class="filter-groups">
           <div id="target-filter"></div>
           <div id="disease-filter"></div>
@@ -41,7 +45,7 @@
         </div>
         <div class="field-block">
           <label class="field-label" for="min-articles">Minimum articles per pair</label>
-          <input id="min-articles" class="number-field" type="number" min="1" step="1" value="1">
+          <input id="min-articles" class="vf-form__input number-field" type="number" min="1" step="1" value="1">
         </div>
         <label class="checkline flagged-toggle"><input id="hide-flagged" type="checkbox" aria-describedby="flagged-help"> Hide flagged disease terms</label>
         <p id="flagged-help" class="filter-help">The source flags some disease terms as possible text-extraction errors. They remain visible by default and are marked ⚠ in the results. Check this box to exclude them.</p>
@@ -52,12 +56,12 @@
         <div class="filter-note">Filters combine across fields. Select multiple values within a field to include any of them.</div>
       </aside>
 
-      <main class="main-panel">
+      <main id="main-content" class="main-panel">
         <section class="overview" aria-labelledby="overview-heading">
-          <div class="overview-heading">
+          <div class="vf-section-header overview-heading">
             <div>
               <p class="eyebrow">Full source matrix</p>
-              <h2 id="overview-heading">Evidence at a glance</h2>
+              <h2 id="overview-heading" class="vf-section-header__heading">Evidence at a glance</h2>
             </div>
             <span id="filtered-badge" class="filtered-badge" hidden>Filtered view</span>
           </div>
@@ -72,12 +76,12 @@
         <section class="matrix-card" aria-labelledby="matrix-heading">
           <div class="matrix-topline">
             <div>
-              <h2 id="matrix-heading">Target × disease matrix</h2>
+              <h2 id="matrix-heading" class="vf-section-header__heading">Target × disease matrix</h2>
               <p id="matrix-status" role="status">Loading dataset…</p>
             </div>
             <div class="matrix-actions">
-              <label for="row-sort">Rows <select id="row-sort"><option value="area">Therapeutic area</option><option value="name">Disease name</option><option value="articles">Most articles</option></select></label>
-              <label for="col-sort">Columns <select id="col-sort"><option value="name">Gene symbol</option><option value="articles">Most articles</option></select></label>
+              <label for="row-sort">Rows <select id="row-sort" class="vf-form__select"><option value="area">Therapeutic area</option><option value="name">Disease name</option><option value="articles">Most articles</option></select></label>
+              <label for="col-sort">Columns <select id="col-sort" class="vf-form__select"><option value="name">Gene symbol</option><option value="articles">Most articles</option></select></label>
             </div>
           </div>
           <div class="matrix-subline">
@@ -95,24 +99,25 @@
         </section>
 
         <section class="results-card" aria-labelledby="results-heading">
-          <div class="results-heading"><div><h2 id="results-heading">Filtered pairs</h2><p>A table of the same evidence shown above.</p></div><button id="download-csv" class="button" type="button">Download CSV</button></div>
-          <div class="table-wrap"><table><thead><tr><th scope="col">Target</th><th scope="col">Disease</th><th scope="col">Therapeutic area</th><th scope="col">Probes</th><th scope="col">Articles</th><th scope="col">Phase</th><th scope="col"><span class="sr-only">Details</span></th></tr></thead><tbody id="results-body"></tbody></table></div>
-          <div class="pager"><span id="page-status"></span><div><button id="page-prev" type="button">Previous</button><button id="page-next" type="button">Next</button></div></div>
+          <div class="results-heading"><div><h2 id="results-heading" class="vf-section-header__heading">Filtered pairs</h2><p>A table of the same evidence shown above.</p></div><button id="download-csv" class="vf-button vf-button--primary vf-button--sm button" type="button">Download CSV</button></div>
+          <div class="table-wrap"><table class="vf-table"><thead><tr class="vf-table__row"><th class="vf-table__heading" scope="col">Target</th><th class="vf-table__heading" scope="col">Disease</th><th class="vf-table__heading" scope="col">Therapeutic area</th><th class="vf-table__heading" scope="col">Probes</th><th class="vf-table__heading" scope="col">Articles</th><th class="vf-table__heading" scope="col">Phase</th><th class="vf-table__heading" scope="col"><span class="sr-only">Details</span></th></tr></thead><tbody id="results-body"></tbody></table></div>
+          <div class="pager"><span id="page-status"></span><div><button id="page-prev" class="vf-button vf-button--secondary vf-button--sm" type="button">Previous</button><button id="page-next" class="vf-button vf-button--secondary vf-button--sm" type="button">Next</button></div></div>
         </section>
-
-        <footer class="site-footer">
-          <div class="project-credits">
-            <div class="project-credit"><span>Developed by</span><a class="developer-identity" href="https://www.ebi.ac.uk/about/teams/chemical-biology-resources/"><img src="./assets/chemical-biology-resources-logo.svg" alt="" width="112" height="28">Chemical Biology Resources at EMBL-EBI</a></div>
-            <div class="project-credit"><span>Funded by</span><a class="funder-logo" href="https://opentargets.org/" aria-label="Open Targets"><img src="./assets/open-targets-logo.svg" alt="" width="166" height="50"></a></div>
-          </div>
-          <p>Literature co-occurrence supports exploration, not a claim of causality or clinical efficacy. ⚠ marks terms flagged by the source disease blacklist as possible extraction errors. Source: <a href="https://zenodo.org/records/20744471" target="_blank" rel="noopener noreferrer">Zenodo record 20744471</a> · <a href="https://github.com/chembl/chemical_probes_lit" target="_blank" rel="noopener noreferrer">analysis code</a>. Structure images: <a href="https://www.ebi.ac.uk/chembl/" target="_blank" rel="noopener noreferrer">ChEMBL</a> and <a href="https://pubchem.ncbi.nlm.nih.gov/compound/24748204" target="_blank" rel="noopener noreferrer">PubChem</a>.</p>
-        </footer>
       </main>
 
       <aside id="detail-panel" class="detail-panel" aria-labelledby="detail-heading" hidden>
         <div class="detail-inner"><div class="detail-topline"><p class="eyebrow">Evidence detail</p><button id="close-detail" class="icon-button" type="button" aria-label="Close detail panel">×</button></div><div id="detail-content"></div></div>
       </aside>
     </div>
+    <footer class="vf-footer site-footer">
+      <div class="vf-body footer-inner">
+        <div class="project-credits">
+          <div class="project-credit"><span>Developed by</span><a class="developer-identity" href="https://www.ebi.ac.uk/about/teams/chemical-biology-resources/"><img src="./assets/chemical-biology-resources-logo.svg" alt="" width="112" height="28">Chemical Biology Resources at EMBL-EBI</a></div>
+          <div class="project-credit"><span>Funded by</span><a class="funder-logo" href="https://opentargets.org/" aria-label="Open Targets"><img src="./assets/open-targets-logo.svg" alt="" width="166" height="50"></a></div>
+        </div>
+        <p>Literature co-occurrence supports exploration, not a claim of causality or clinical efficacy. ⚠ marks terms flagged by the source disease blacklist as possible extraction errors. Source: <a href="https://zenodo.org/records/20744471" target="_blank" rel="noopener noreferrer">Zenodo record 20744471</a> · <a href="https://github.com/chembl/chemical_probes_lit" target="_blank" rel="noopener noreferrer">analysis code</a>. Structure images: <a href="https://www.ebi.ac.uk/chembl/" target="_blank" rel="noopener noreferrer">ChEMBL</a> and <a href="https://pubchem.ncbi.nlm.nih.gov/compound/24748204" target="_blank" rel="noopener noreferrer">PubChem</a>.</p>
+      </div>
+    </footer>
     <div id="matrix-tooltip" class="matrix-tooltip" role="tooltip" hidden></div>
   </body>
 </html>

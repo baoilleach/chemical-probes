@@ -84,7 +84,7 @@ function makeMultiFilter(hostId, title, options, stateKey) {
   summary.append(count);
   details.append(summary);
   const inner = node("div", "filter-inner");
-  const search = node("input", "filter-search");
+  const search = node("input", "vf-form__input filter-search");
   search.type = "search";
   search.placeholder = `Find and select ${title.toLowerCase()}`;
   search.setAttribute("aria-label", `Find and select ${title.toLowerCase()}`);
@@ -568,10 +568,10 @@ function renderTable() {
   for (const view of viewPairs.slice(start, start + PAGE_SIZE)) {
     const target = dataset.targets[view.pair.targetIndex];
     const disease = dataset.diseases[view.pair.diseaseIndex];
-    const row = node("tr");
-    for (const value of [target.name, `${disease.flagged ? "⚠ " : ""}${disease.name}`, areaName(areaId(disease)), String(view.probeCount), formatNumber(view.articles), phaseLabel(view.pair.phase)]) row.append(node("td", "", value));
-    const action = node("td");
-    const button = node("button", "mini-button", "View evidence");
+    const row = node("tr", "vf-table__row");
+    for (const value of [target.name, `${disease.flagged ? "⚠ " : ""}${disease.name}`, areaName(areaId(disease)), String(view.probeCount), formatNumber(view.articles), phaseLabel(view.pair.phase)]) row.append(node("td", "vf-table__cell", value));
+    const action = node("td", "vf-table__cell");
+    const button = node("button", "vf-button vf-button--link vf-button--sm mini-button", "View evidence");
     button.type = "button";
     button.setAttribute("aria-label", `View evidence for ${target.name} and ${disease.name}`);
     button.addEventListener("click", () => openDetail(view));
@@ -580,8 +580,8 @@ function renderTable() {
     body.append(row);
   }
   if (!viewPairs.length) {
-    const row = node("tr");
-    const cell = node("td", "empty-state", "No matching pairs.");
+    const row = node("tr", "vf-table__row");
+    const cell = node("td", "vf-table__cell empty-state", "No matching pairs.");
     cell.colSpan = 7;
     row.append(cell);
     body.append(row);
