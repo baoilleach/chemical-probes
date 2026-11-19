@@ -1,9 +1,10 @@
 const LEFT = 236;
 const TOP = 112;
+const CELL_SIZE = 32;
 const PAGE_SIZE = 50;
 const COLORS = ["#fff7c1", "#dceeb5", "#a7ddd0", "#60c0ce", "#4a9ac4", "#4d5b97"];
 const elements = Object.fromEntries([
-  "global-search", "min-articles", "hide-flagged", "phase-options", "row-sort", "col-sort", "zoom", "show-empty",
+  "global-search", "min-articles", "hide-flagged", "phase-options", "row-sort", "col-sort", "show-empty",
   "filtered-badge", "pair-count", "target-count", "disease-count", "probe-count", "matrix-status",
   "matrix-viewport", "matrix-content", "matrix-canvas", "matrix-tooltip", "results-body", "page-status",
   "page-prev", "page-next", "download-csv", "reset-filters", "detail-panel", "detail-content", "close-detail",
@@ -25,7 +26,7 @@ let resizeObserver;
 let filterWidgets = [];
 const state = {
   query: "", targets: new Set(), diseases: new Set(), areas: new Set(), probes: new Set(),
-  phases: new Set(), minArticles: 1, hideFlagged: false, rowSort: "area", colSort: "name", showEmpty: false, zoom: 36,
+  phases: new Set(), minArticles: 1, hideFlagged: false, rowSort: "area", colSort: "name", showEmpty: false,
 };
 
 function node(tag, className, value) {
@@ -59,7 +60,6 @@ function readURL() {
   state.rowSort = ["area", "name", "articles"].includes(params.get("rows")) ? params.get("rows") : "area";
   state.colSort = ["name", "articles"].includes(params.get("columns")) ? params.get("columns") : "name";
   state.showEmpty = params.get("empty") === "1";
-  state.zoom = [28, 32, 36, 40, 44, 48, 52, 56].includes(Number(params.get("size"))) ? Number(params.get("size")) : 36;
 }
 
 function updateURL() {
@@ -73,7 +73,6 @@ function updateURL() {
   if (state.rowSort !== "area") params.set("rows", state.rowSort);
   if (state.colSort !== "name") params.set("columns", state.colSort);
   if (state.showEmpty) params.set("empty", "1");
-  if (state.zoom !== 36) params.set("size", String(state.zoom));
   const query = params.toString();
   history.replaceState(null, "", `${location.pathname}${query ? `?${query}` : ""}${location.hash}`);
 }
@@ -150,7 +149,6 @@ function syncSimpleControls() {
   elements["hide-flagged"].checked = state.hideFlagged;
   elements["row-sort"].value = state.rowSort;
   elements["col-sort"].value = state.colSort;
-  elements.zoom.value = state.zoom;
   elements["show-empty"].checked = state.showEmpty;
   for (const widget of filterWidgets) {
     for (const option of widget.optionNodes) option.input.checked = state[widget.stateKey].has(option.input.value);
@@ -270,7 +268,7 @@ function resizeMatrix() {
   const viewport = elements["matrix-viewport"];
   const canvas = elements["matrix-canvas"];
   const content = elements["matrix-content"];
-  const size = state.zoom;
+  const size = CELL_SIZE;
   content.style.width = `${Math.max(viewport.clientWidth, LEFT + columns.length * size + 2)}px`;
   content.style.height = `${Math.max(viewport.clientHeight, TOP + rows.length * size + 2)}px`;
   const width = viewport.clientWidth;
@@ -297,7 +295,7 @@ function drawMatrix() {
   const context = canvas.getContext("2d");
   const width = viewport.clientWidth;
   const height = viewport.clientHeight;
-  const size = state.zoom;
+  const size = CELL_SIZE;
   const scrollX = viewport.scrollLeft;
   const scrollY = viewport.scrollTop;
   const firstColumn = clamp(Math.floor(scrollX / size), 0, columns.length);
@@ -342,9 +340,9 @@ function drawMatrix() {
       context.strokeStyle = view.pair === selectedPair ? "#123a55" : "#87a5aa";
       context.lineWidth = view.pair === selectedPair ? 2.5 : .8;
       context.stroke();
-      if (size >= 32 && radius >= 8) {
+      if (radius >= 8) {
         context.fillStyle = "#14313d";
-        context.font = `600 ${size >= 44 ? 12 : 10}px ui-sans-serif,system-ui,sans-serif`;
+        context.font = "600 10px ui-sans-serif,system-ui,sans-serif";
         context.textAlign = "center";
         context.textBaseline = "middle";
         context.fillText(phaseLabel(view.pair.phase), x, y + .5);
@@ -425,8 +423,8 @@ function cellAt(event) {
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
   if (x < LEFT || y < TOP) return null;
-  const columnIndex = Math.floor((x - LEFT + elements["matrix-viewport"].scrollLeft) / state.zoom);
-  const rowIndex = Math.floor((y - TOP + elements["matrix-viewport"].scrollTop) / state.zoom);
+  const columnIndex = Math.floor((x - LEFT + elements["matrix-viewport"].scrollLeft) / CELL_SIZE);
+  const rowIndex = Math.floor((y - TOP + elements["matrix-viewport"].scrollTop) / CELL_SIZE);
   if (columnIndex < 0 || rowIndex < 0 || columnIndex >= columns.length || rowIndex >= rows.length) return null;
   return cellMap.get(pairKey(columns[columnIndex], rows[rowIndex])) || null;
 }
@@ -622,7 +620,6 @@ function bindControls() {
   elements["hide-flagged"].addEventListener("change", (event) => { state.hideFlagged = event.target.checked; applyFilters(); });
   elements["row-sort"].addEventListener("change", (event) => { state.rowSort = event.target.value; applyFilters(); });
   elements["col-sort"].addEventListener("change", (event) => { state.colSort = event.target.value; applyFilters(); });
-  elements.zoom.addEventListener("input", (event) => { state.zoom = Number(event.target.value); applyFilters(); });
   elements["show-empty"].addEventListener("change", (event) => { state.showEmpty = event.target.checked; applyFilters(); });
   elements["reset-filters"].addEventListener("click", () => {
     state.query = "";
@@ -631,7 +628,6 @@ function bindControls() {
     state.hideFlagged = false;
     state.rowSort = "area";
     state.colSort = "name";
-    state.zoom = 36;
     state.showEmpty = false;
     syncSimpleControls();
     applyFilters();
@@ -659,12 +655,12 @@ function bindControls() {
       keyboardCell.row = clamp(keyboardCell.row + movement[0], 0, rows.length - 1);
       keyboardCell.column = clamp(keyboardCell.column + movement[1], 0, columns.length - 1);
       const viewport = elements["matrix-viewport"];
-      const x = LEFT + keyboardCell.column * state.zoom;
-      const y = TOP + keyboardCell.row * state.zoom;
+      const x = LEFT + keyboardCell.column * CELL_SIZE;
+      const y = TOP + keyboardCell.row * CELL_SIZE;
       if (x - viewport.scrollLeft < LEFT) viewport.scrollLeft = x - LEFT;
-      if (x + state.zoom - viewport.scrollLeft > viewport.clientWidth) viewport.scrollLeft = x + state.zoom - viewport.clientWidth;
+      if (x + CELL_SIZE - viewport.scrollLeft > viewport.clientWidth) viewport.scrollLeft = x + CELL_SIZE - viewport.clientWidth;
       if (y - viewport.scrollTop < TOP) viewport.scrollTop = y - TOP;
-      if (y + state.zoom - viewport.scrollTop > viewport.clientHeight) viewport.scrollTop = y + state.zoom - viewport.clientHeight;
+      if (y + CELL_SIZE - viewport.scrollTop > viewport.clientHeight) viewport.scrollTop = y + CELL_SIZE - viewport.clientHeight;
       const target = dataset.targets[columns[keyboardCell.column]];
       const disease = dataset.diseases[rows[keyboardCell.row]];
       const view = cellMap.get(pairKey(columns[keyboardCell.column], rows[keyboardCell.row]));
