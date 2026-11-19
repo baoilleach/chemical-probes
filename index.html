@@ -41,7 +41,8 @@
           <label class="field-label" for="min-articles">Minimum articles per pair</label>
           <input id="min-articles" class="number-field" type="number" min="1" step="1" value="1">
         </div>
-        <label class="checkline flagged-toggle"><input id="hide-flagged" type="checkbox"> Hide flagged disease terms</label>
+        <label class="checkline flagged-toggle"><input id="hide-flagged" type="checkbox" aria-describedby="flagged-help"> Hide flagged disease terms</label>
+        <p id="flagged-help" class="filter-help">The source flags some disease terms as possible text-extraction errors. They remain visible by default and are marked ⚠ in the results. Check this box to exclude them.</p>
         <fieldset class="phase-filter">
           <legend>Maximum clinical phase</legend>
           <div id="phase-options" class="phase-options"></div>
